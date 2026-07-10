@@ -4,7 +4,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/yuvika7/devops-task.git'
+                git branch: 'main',
+                     url: 'https://github.com/yuvika7/devops-task.git'
             }
         }
 
@@ -22,9 +23,11 @@ pipeline {
 
         stage('Deploy') {
             steps {
+                 withCredentials([file(credentialsId: 'my-kubeconfig', variable: 'KUBECONFIG')]){
                 sh 'helm upgrade --install devops-release app-chart'
             }
         }
+     }
 
         stage('Verify') {
             steps {
