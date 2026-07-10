@@ -2,6 +2,17 @@
 
 set -e
 
+REPO_URL="https://github.com/yuvika7/devops-task.git"
+PROJECT_DIR="devops-task"
+
+
+if [ ! -d "$PROJECT_DIR" ]; then
+    echo "Cloning repository..."
+    git clone $REPO_URL
+fi
+
+cd $PROJECT_DIR
+
 APP_NAME="devops-app"
 IMAGE_NAME="devops-app:latest"
 
@@ -22,16 +33,14 @@ COPY index.php /var/www/html/index.php
 EOF
 
 else
-    echo "No supported application found."
+    echo "No application"
     exit 1
 fi
 
-echo ""
-echo "Building Docker Image..."
+echo "Building Docker image..."
 docker build -t $IMAGE_NAME .
 
-echo ""
-echo "Deploying to Kubernetes..."
+echo "Deploying application to Kubernetes..."
 
 kubectl apply -f k8s/pvc.yaml
 kubectl apply -f k8s/deployment.yaml
@@ -39,19 +48,16 @@ kubectl apply -f k8s/service.yaml
 kubectl apply -f k8s/ingress.yaml
 kubectl apply -f k8s/hpa.yaml
 
-echo ""
-echo "Restarting Deployment..."
+echo "Restarting deployment..."
+kubectl rollout restart deployment/$APP_NAME
 
-kubectl rollout restart deployment devops-app
+echo "Waiting for deployment to complete..."
+kubectl rollout status deployment/$APP_NAME
 
-echo ""
-echo "Waiting for Pods..."
-
-kubectl rollout status deployment/devops-app
+echo "Deployment completed successfully."
 
 echo ""
-echo "Deployment Successful!"
-
 kubectl get pods
 kubectl get svc
 kubectl get ingress
+kubectl get hpa
