@@ -31,10 +31,12 @@ pipeline {
 
         stage('Verify') {
             steps {
+           withCredentials([file(credentialsId: 'my-kubeconfig', variable: 'KUBECONFIG')]) {
                 sh 'kubectl get pods'
                 sh 'kubectl get svc'
                 sh 'kubectl get ingress'
             }
-        }
+          }
+       }
     }
 }
