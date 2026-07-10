@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -19,7 +18,7 @@ jobs:
 
       - name: Package Helm Chart
         run: |
-          mkdir packaged
+          mkdir -p packaged
           helm package app-chart -d packaged
 
       - name: Upload Helm Chart
